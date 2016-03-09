@@ -7,6 +7,33 @@ var chokidar = require('chokidar');
 var eventEmitter = new events.EventEmitter();
 var dataStore = require('./data-store')(eventEmitter);
 var amqp = require('amqplib/callback_api');
+var Client = require('node-rest-client').Client;
+var port = 3000;
+
+	var args = {
+		data: JSON.stringify({
+		    "ID": "data-store",
+		    "Name": "data-store",
+		    "Tags": [
+		    	"data-store"
+		    ],
+		    "Address": "127.0.0.1",
+		    "Port": port
+		})
+	};
+
+ 	var client = new Client();
+	client.put("http://localhost:8500/v1/agent/service/register", args, function (data, response) {});
+
+process.on( 'SIGINT', function() {
+    console.log( "\nGracefully shutting down from SIGINT (Ctrl-C)" );
+    console.log( "\nRemoving self from service discovery..." );
+
+    var client = new Client();
+    client.delete("http://localhost:8500/v1/agent/service/deregister/data-store", function (data, response) {});
+
+    process.exit( );
+});
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
@@ -37,4 +64,4 @@ chokidar.watch('data-store', {ignored: /[\/\\]\./})
 		eventEmitter.emit('fileRemoved', path);
 	});
 
-app.listen(3000);
+app.listen(port);

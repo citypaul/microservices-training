@@ -12,6 +12,7 @@
     "amqplib": "^0.4.1",
     "body-parser": "^1.15.0",
     "chokidar": "^1.4.3",
-    "express": "^4.13.4"
+    "express": "^4.13.4",
+    "node-rest-client": "^1.8.0"
   }
 }
