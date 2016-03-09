@@ -6,6 +6,7 @@ var fs = require('fs');
 var chokidar = require('chokidar');
 var eventEmitter = new events.EventEmitter();
 var dataStore = require('./data-store')(eventEmitter);
+var amqp = require('amqplib/callback_api');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
@@ -14,9 +15,18 @@ app.get('/tennis-events', function(req, res){
     res.json(dataStore.getContent());
 });
 
-app.post('/file', function(req, res) {
-	eventEmitter.emit('createFile', req.body);
-	res.send('File created: ' + req.body.id);
+amqp.connect('amqp://localhost', function(err, conn) {
+	conn.createChannel(function(err, ch) {
+		var q = 'fileQueue';
+
+		ch.assertQueue(q, {durable: false});
+		console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", q);
+		ch.consume(q, function(message) {
+			var payload = JSON.parse(message.content.toString());
+			eventEmitter.emit('createFile', payload);
+				console.log(" [x] Received %s", JSON.stringify(payload));
+		}, {noAck: true});
+	});
 });
 
 chokidar.watch('data-store', {ignored: /[\/\\]\./})
