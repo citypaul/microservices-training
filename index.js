@@ -11,13 +11,15 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
 app.get('/tennis-events', function(req, res){
-    res.json(dataStore.write());
+    res.json(dataStore.getContent());
 });
 
-chokidar.watch('data-store', {ignored: /[\/\\]\./}).on('all', function (event, path) {
-    eventEmitter.emit('fileAdded', path);
-});
-
+chokidar.watch('data-store', {ignored: /[\/\\]\./})
+	.on('add', function (path) {
+	    eventEmitter.emit('fileAdded', path);
+	})
+	.on('unlink', function (path) {
+		eventEmitter.emit('fileRemoved', path);
+	});
 
 app.listen(3000);
-console.log('on port 3000');
