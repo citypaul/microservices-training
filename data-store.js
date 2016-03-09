@@ -5,6 +5,16 @@ module.exports = function (eventEmitter) {
 
     eventEmitter.on('fileAdded', addFile);
     eventEmitter.on('fileRemoved', removeFile)
+    eventEmitter.on('createFile', createFile);
+
+    function createFile(data) {
+        var fileName = __dirname + '/data-store/' + data.id + '.json';
+        if(filePaths.indexOf(fileName) < 0) {
+            fs.writeFile(fileName, JSON.stringify(data.content), function(err) {
+                console.log(err);
+            });
+        }
+    }
 
     function addFile(path) {
         var filePath = __dirname + '/' + path;
