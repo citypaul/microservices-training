@@ -16,7 +16,7 @@ app.get('/tennis-events', function(req, res){
 
 app.post('/file', function(req, res) {
 	eventEmitter.emit('createFile', req.body);
-	res.send('File created: ' + res.body.id);
+	res.send('File created: ' + req.body.id);
 });
 
 chokidar.watch('data-store', {ignored: /[\/\\]\./})
