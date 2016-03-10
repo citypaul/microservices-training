@@ -9,13 +9,12 @@ var dataStore = require('./data-store')(eventEmitter);
 var amqp = require('amqplib/callback_api');
 var Client = require('node-rest-client').Client;
 var ServiceDiscovery = require('./service-discovery')();
-var port = 3000;
+var port = require('./config/config')['Port'];
 
 ServiceDiscovery.connect();
 
 process.on( 'SIGINT', function() {
     console.log( "\nGracefully shutting down from SIGINT (Ctrl-C)" );
-    
     ServiceDiscovery.disconnect(process.exit);
 });
 
