@@ -3,6 +3,7 @@ var Client = require('node-rest-client').Client,
 	config = require('./config/config');
 
 module.exports = function() {
+	var consulIP = process.env.CONSULIP ? process.env.CONSULIP : 'localhost';
 
 	function connect(callback) {
 		var args = { 
@@ -11,7 +12,7 @@ module.exports = function() {
 			};
 		console.log(' [s] Connecting to service discovery');
 		client.put(
-			"http://localhost:8500/v1/agent/service/register", 
+			"http://" + consulIP + ":8500/v1/agent/service/register",
 			args, 
 			function (data, response) {
 				callback && callback();
@@ -23,7 +24,7 @@ module.exports = function() {
 	function disconnect(callback) {
 		console.log(' [s] Disconnecting from service discovery');
     	client.get(
-    		"http://localhost:8500/v1/agent/service/deregister/datastore", 
+    		"http://" + consulIP + ":8500/v1/agent/service/deregister/datastore",
     		function (data, response) {
     			callback && callback();
     		}
